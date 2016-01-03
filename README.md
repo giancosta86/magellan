@@ -60,7 +60,7 @@ The binary packages are available in the [releases area](https://github.com/gian
 
   where a *deployment dir* is a **standalone/deployments** subdirectory in a WildFly root directory
 
-* To run the JavaFX application, just execute **gradle run**, passing the 2 parameter described above
+* To run the JavaFX application, just execute **gradle run**, passing the 2 parameters described above
 
 
 
