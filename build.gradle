@@ -1,0 +1,148 @@
+/*§
+  ===========================================================================
+  Magellan
+  ===========================================================================
+  Copyright (C) 2016 Gianluca Costa
+  ===========================================================================
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ===========================================================================
+*/
+
+buildscript {
+    repositories {
+        maven {
+            url 'https://dl.bintray.com/giancosta86/Hephaestus'
+        }
+
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'info.gianlucacosta.moonlicense:moonlicense-gradle:4.0'
+    }
+}
+
+
+apply plugin: 'ear'
+apply plugin: 'info.gianlucacosta.moonlicense'
+
+
+version '1.0'
+
+description = 'Modern Java EE example suite for WildFly'
+
+moonLicense {
+    license = apache2
+
+    productInfo {
+        productName = 'Magellan'
+        inceptionYear = 2016
+        copyrightHolder = 'Gianluca Costa'
+    }
+}
+
+
+allprojects {
+    /*
+    All the projects share the same artifact group
+     */
+    group 'info.gianlucacosta.clustering.magellan'
+}
+
+
+subprojects {
+    apply plugin: 'scala'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compile 'org.scala-lang:scala-library:2.11.7'
+    }
+
+    //compileScala depends on compileJava, therefore this is more generic
+    compileJava.dependsOn(rootProject.setNotices)
+
+    processResources.dependsOn(rootProject.setNotices)
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    deploy project(path: ":magellan-war", configuration: "archives")
+    deploy project(":magellan-ejb")
+
+    earlib project(":magellan-common")
+    earlib 'org.scala-lang:scala-library:2.11.7'
+}
+
+
+task setupWebContexts << {
+    ear.deploymentDescriptor.webModule(
+            project(":magellan-war").war.archiveName,
+            "/magellan"
+    )
+}
+
+
+ear {
+    deploymentDescriptor {
+        applicationName = "Magellan"
+        displayName = "Magellan"
+        description = "A simple JavaEE suite to play with clustering"
+    }
+}
+
+ear.dependsOn(setupWebContexts, subprojects.build)
+
+
+def buildDeployTask(deployTaskName, deploymentDirProperty) {
+    def deploymentDir =
+            project.hasProperty(deploymentDirProperty) ?
+                    project.property(deploymentDirProperty).toString()
+                    :
+                    null
+
+    task(deployTaskName, type: Copy, dependsOn: "build") {
+        from('build/libs/')
+        into(deploymentDir)
+        include("*.ear")
+
+        outputs.upToDateWhen {
+            def sourceEar = project.file("build/libs/" + project.ear.archiveName)
+
+            def targetEar = new File(
+                    deploymentDir,
+                    project.ear.archiveName
+            )
+
+            targetEar.exists() && (
+                    targetEar.lastModified() >= sourceEar.lastModified()
+            )
+        }
+    }
+}
+
+
+buildDeployTask("deployToAlpha", "alphaDeploymentDir")
+buildDeployTask("deployToBeta", "betaDeploymentDir")
+
+
+task deploy {
+    dependsOn deployToAlpha, deployToBeta, ":magellan-common:install"
+}

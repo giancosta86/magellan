@@ -1,0 +1,46 @@
+/*§
+  ===========================================================================
+  Magellan
+  ===========================================================================
+  Copyright (C) 2016 Gianluca Costa
+  ===========================================================================
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ===========================================================================
+*/
+
+version '1.0'
+
+apply plugin: 'application'
+
+mainClassName = 'info.gianlucacosta.clustering.magellan.appclient.App'
+
+//On Windows, we don't want to see a DOS Windows in the background
+startScripts {
+    def originalWindowsTemplateString = windowsStartScriptGenerator.template.asString()
+    def javawTemplateString =
+            originalWindowsTemplateString
+                    .replace("java.exe", "javaw.exe")
+                    .replace("\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS%", "start \"\" /B \"%JAVA_EXE%\" %DEFAULT_JVM_OPTS%")
+    def javawTemplate = project.resources.text.fromString(javawTemplateString)
+    windowsStartScriptGenerator.template = javawTemplate
+}
+
+
+dependencies {
+    compile 'org.scalafx:scalafx_2.11:8.0.60-R9'
+    compile 'org.wildfly:wildfly-ejb-client-bom:9.0.2.Final'
+
+    compile project(":magellan-common")
+}
+
+run.dependsOn(rootProject.deploy)
