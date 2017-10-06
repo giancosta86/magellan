@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Magellan is a basic application, created to support the article [Magellan - A clustering tutorial with WildFly, nginx, Scala(FX) and Gradle](http://gianlucacosta.info/wildfly-clustering/); apart from that, its most valuable feature is perhaps the mix of modern technologies employed, demonstrating how they can find a natural place in the Java EE ecosystem.
+Magellan is a basic application, created to support the article [Magellan - A clustering tutorial with WildFly, nginx, Scala(FX) and Gradle](http://gianlucacosta.info/wildfly-clustering); apart from that, its most valuable feature is perhaps the mix of modern technologies employed, demonstrating how they can find a natural place in the Java EE ecosystem.
 
 
 ## Technologies employed
@@ -66,6 +66,6 @@ The binary packages are available in the [releases area](https://github.com/gian
 
 ## Further references
 
-* [Magellan - A clustering tutorial with WildFly, nginx, Scala(FX) and Gradle](http://gianlucacosta.info/wildfly-clustering/)
+* [Magellan - A clustering tutorial with WildFly, nginx, Scala(FX) and Gradle](http://gianlucacosta.info/wildfly-clustering)
 
 * [MoonDeploy](https://github.com/giancosta86/moondeploy)
